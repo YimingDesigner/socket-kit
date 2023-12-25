@@ -90,16 +90,6 @@ class MySQLDatabase:
         else:
             return False
 
-    def userAuthenticate(self, token: str) -> bool:
-        connection = self.connect()
-        cursor = connection.cursor()
-        token = hashlib.sha256(token.encode()).hexdigest()
-        cursor.execute("SELECT * FROM userdata WHERE username = %s AND password = %s", ("_token_", token))
-        if cursor.fetchall():
-            return True
-        else:
-            return False
-
 def randomToken(k: int = 16) -> str:
     return "".join(random.choices(string.ascii_letters + string.digits, k=k))
 
@@ -127,7 +117,7 @@ def userAuthenticate(client: socket.socket, database: MySQLDatabase) -> bool:
             return False
     return True
 
-def userLogin(client: socket.socket, username: str, password: str):
+def userLogin(client: socket.socket, username: str, password: str) -> bool:
     message = client.recv(1024).decode()
     client.send(username.encode())
     message = client.recv(1024).decode()
@@ -140,6 +130,9 @@ def userLogin(client: socket.socket, username: str, password: str):
         return True
     else:
         return False
+
+def userLogin(client: socket.socket, token: str) -> bool:
+    return userLogin(client, "_token_", token)
 
 def userLoginCLI(client: socket.socket):
     isLogin = "failed"

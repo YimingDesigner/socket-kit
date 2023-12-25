@@ -30,6 +30,8 @@ database.createTable("table_name", """
 
 database.createUserTabel()
 database.createUser("username", "password")
+token = socket_kit.randomToken()
+database.createUser(token)
 ```
 
 ### Server Side
@@ -48,6 +50,7 @@ else: continue
 from socket_kit import socket_kit
 
 socket_kit.userLogin(client, "username", "password")
+socket_kit.userLogin(client, "token")
 # login in CLI
 socket_kit.userLoginCLI(client)
 ```
