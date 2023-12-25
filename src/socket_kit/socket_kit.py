@@ -73,7 +73,7 @@ class MySQLDatabase:
         cursor.execute("INSERT INTO userdata (username, password) VALUES (%s, %s)", (username, password))
         connection.commit()
     
-    def createUser(self, token: str):
+    def createUserWithToken(self, token: str):
         connection = self.connect()
         cursor = connection.cursor()
         token = hashlib.sha256(token.encode()).hexdigest()
@@ -131,7 +131,7 @@ def userLogin(client: socket.socket, username: str, password: str) -> bool:
     else:
         return False
 
-def userLogin(client: socket.socket, token: str) -> bool:
+def userLoginWithToken(client: socket.socket, token: str) -> bool:
     return userLogin(client, "_token_", token)
 
 def userLoginCLI(client: socket.socket):
