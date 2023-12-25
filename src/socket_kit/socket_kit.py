@@ -4,6 +4,8 @@ import pickle
 import cv2, numpy
 import hashlib
 import mysql.connector
+import random
+import string
 from time import sleep
 import logging
 
@@ -60,7 +62,8 @@ class MySQLDatabase:
         self.createTable(title, """
             id INTEGER PRIMARY KEY AUTO_INCREMENT,
             username VARCHAR(255) NOT NULL,
-            password VARCHAR(255) NOT NULL
+            password VARCHAR(255) NOT NULL,
+            note VARCHAR(65535)
         """)
 
     def createUser(self, username: str, password: str):
@@ -68,6 +71,13 @@ class MySQLDatabase:
         cursor = connection.cursor()
         password = hashlib.sha256(password.encode()).hexdigest()
         cursor.execute("INSERT INTO userdata (username, password) VALUES (%s, %s)", (username, password))
+        connection.commit()
+    
+    def createUser(self, token: str):
+        connection = self.connect()
+        cursor = connection.cursor()
+        token = hashlib.sha256(token.encode()).hexdigest()
+        cursor.execute("INSERT INTO userdata (username, password) VALUES (%s, %s)", ("_token_", token))
         connection.commit()
 
     def userAuthenticate(self, username: str, password: str) -> bool:
@@ -79,6 +89,19 @@ class MySQLDatabase:
             return True
         else:
             return False
+
+    def userAuthenticate(self, token: str) -> bool:
+        connection = self.connect()
+        cursor = connection.cursor()
+        token = hashlib.sha256(token.encode()).hexdigest()
+        cursor.execute("SELECT * FROM userdata WHERE username = %s AND password = %s", ("_token_", token))
+        if cursor.fetchall():
+            return True
+        else:
+            return False
+
+def randomToken(k: int = 16) -> str:
+    return "".join(random.choices(string.ascii_letters + string.digits, k=k))
 
 def userAuthenticate(client: socket.socket, database: MySQLDatabase) -> bool:
     isAuthenticated = False
