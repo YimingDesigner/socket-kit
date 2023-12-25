@@ -5,7 +5,7 @@
 ## Server and Client
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 server = createServer("192.168.31.138", 9990, clientNum=3)
 server = createdLocalhostServer(9990, clientNum=3)
@@ -18,7 +18,7 @@ client = createClient("192.168.31.138", 9990)
 ### Database Side
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 database = socket_kit.MySQLDatabase("database_name", host="localhost" username="root", password="password")
 
@@ -35,7 +35,7 @@ database.createUser("username", "password")
 ### Server Side
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 if socket_kit.userAuthenticate(client, database):
     print("Connected with", address)
@@ -45,7 +45,7 @@ else: continue
 ### Client Side
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 socket_kit.userLogin(client, "username", "password")
 # login in CLI
@@ -59,7 +59,7 @@ To concentrate on data transfer, the code below will ignore the concept of serve
 ### Sender
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 # send pure data
 data = b""
@@ -78,7 +78,7 @@ client.sendall(message)
 ### Receiver
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 # receive pure data
 data = socket_kit.receiveData(client)
@@ -104,7 +104,7 @@ while True:
 ## OpenCV
 
 ```python
-import socket_kit
+from socket_kit import socket_kit
 
 capture = socket_kit.createCapture()
 
