@@ -2,15 +2,36 @@
 
 `socket-kit` is a utility with concise and more fluent code in socket programming. It handles the job of creating server/client, database operations, transferring data and file over network, as well as OpenCV support.
 
-## Server and Client
+## Socket
 
 ```python
-from socket_kit import socket_kit
+from socket_kit import socket
 
-server = createServer("192.168.31.138", 9990, clientNum=3)
-server = createdLocalhostServer(9990, clientNum=3)
-server = createdLocalIPServer(9990, clientNum=3)
-client = createClient("192.168.31.138", 9990)
+server = socket.createServer("192.168.31.138", 9990, clientNum=3)
+server = socket.createdLocalIPServer(9990, clientNum=3)
+
+client = socket.createClient("192.168.31.138", 9990)
+```
+
+### Pack and Send Message
+
+```python
+from socket_kit import socket
+
+message = socket.packData("Hello".encode())
+message = socket.packFile("movieFile.mp4")
+message = socket.packFrame(frame, format=".jpg", quality=95)
+
+client.sendall(message)
+```
+
+### Receive Message
+
+```python
+data, remainedMessage = receiveData(client, message=b"", bufferSize=4096)
+frame, remainedMessage = receiveFrame(client, message=b"", bufferSize=4096)
+# use original file name if left "saveFile" blank
+filePath, remainedMessage = receiveFile(client, "path/save/folder", saveFile="", message: bytes = b"", bufferSize: int = 4096)
 ```
 
 ## Database
@@ -18,7 +39,7 @@ client = createClient("192.168.31.138", 9990)
 ### Database Side
 
 ```python
-from socket_kit import socket_kit
+from socket_kit import database
 
 database = socket_kit.MySQLDatabase("database_name", host="localhost" username="root", password="password")
 
@@ -39,7 +60,7 @@ database.createUserWithToken(token)
 ### Server Side
 
 ```python
-from socket_kit import socket_kit
+from socket_kit import database
 
 if socket_kit.userAuthenticate(client, database):
     print("Connected with", address)
@@ -49,50 +70,12 @@ else: continue
 ### Client Side
 
 ```python
-from socket_kit import socket_kit
+from socket_kit import database
 
 socket_kit.userLogin(client, "username", "password")
 socket_kit.userLoginWithToken(client, "token")
 # login in CLI
 socket_kit.userLoginCLI(client)
-```
-
-## Data Transfer
-
-To concentrate on data transfer, the code below will ignore the concept of server/client, because the sender/receiver can appear at both depending on your requirement.
-
-### Sender
-
-```python
-from socket_kit import socket_kit
-
-# send pure data
-data = b""
-message = socket_kit.packData(data)
-client.sendall(message)
-
-# send file
-message = socket_kit.packFile("movieFile.mp4")
-client.sendall(message)
-
-# send frame (OpenCV)
-message = socket_cv.packFrame(frame)
-client.sendall(message)
-```
-
-### Receiver
-
-```python
-from socket_kit import socket_kit
-
-# receive pure data
-data = socket_kit.receiveData(client)
-
-# receive file
-socket_kit.receiveFile("savedFile.mp4", client)
-
-# receive frame (OpenCV)
-frame = socket_kit.receiveFrame(client)
 ```
 
 ### Stream Receiver
@@ -106,19 +89,20 @@ while True:
     frame, message = socket_kit.receiveStreamFrame(message, client)
 ```
 
-## OpenCV
+## Vision (OpenCV)
 
 ```python
-from socket_kit import socket_kit
+from socket_kit import vision
 
-capture = socket_kit.createCapture()
+capture = vision.createCapture()
 
 # default .mp4 with Codec H264
-writer = socket_kit.createWriter(capture, "saveMovie.mp4")
-socket_kit.saveFrameToMovie(frame, writer)
+writer = vision.createWriter(capture, "saveMovie.mp4")
+vision.saveFrameToMovie(frame, writer)
 
-socket_kit.saveFrameToPhoto(frame, "saveMovie.png")
+vision.saveFrameToPhoto(frame, "saveMovie.png")
 
-socket_kit.showFrame("frame", frame)
+shown = vision.showFrame("frame", frame)
+if not shown: break
 ```
 
